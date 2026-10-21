@@ -2,259 +2,533 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <title>MasterVoice — Ultimate Team Messenger</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MasterVoice — Gold Telegram PRO</title>
     <style>
-        body { 
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
-            text-align: center; 
-            margin: 0; 
-            padding-top: 30px; 
-            background: #0d1117; 
-            color: #c9d1d9; 
+        @keyframes goldShine {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
         }
-        .container {
-            max-width: 440px;
-            margin: 0 auto;
-            background: #161b22;
-            padding: 25px;
-            border-radius: 14px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.6);
-            border: 1px solid #30363d;
+
+        :root {
+            --bg-color: #0c0d10;
+            --card-bg: #151821;
+            --card-hover: #1f2430;
+            --gold-gradient: linear-gradient(-45deg, #bf953f, #fcf6ba, #b38728, #fbf5b7, #aa771c);
+            --gold-glow: 0 0 25px rgba(212, 175, 55, 0.4);
+            --text-main: #ffffff;
+            --text-secondary: #949ba4;
+            --border-color: #232731;
         }
-        h2 { color: #58a6ff; margin-bottom: 5px; font-size: 24px; }
-        .subtitle { font-size: 11px; color: #8b949e; margin-bottom: 20px; text-transform: uppercase; letter-spacing: 2px; font-weight: bold; }
-        
-        input { 
-            width: 85%; 
-            padding: 12px; 
-            font-size: 15px; 
-            margin-bottom: 12px; 
-            border-radius: 6px; 
-            border: 1px solid #30363d; 
-            background: #0d1117; 
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .app-container {
+            width: 100%;
+            max-width: 420px;
+            background: var(--bg-color);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            box-sizing: border-box;
+            position: relative;
+            padding-bottom: 75px;
+        }
+
+        /* Переливающаяся золотая шапка */
+        .tg-header {
+            padding: 16px 20px;
+            font-size: 20px;
+            font-weight: 800;
+            background: var(--card-bg);
+            border-bottom: 2px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .gold-text {
+            background: var(--gold-gradient);
+            background-size: 400% 400%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: goldShine 6s ease infinite;
+        }
+
+        .content-area {
+            flex: 1;
+            padding: 14px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .screen { display: none; flex: 1; flex-direction: column; }
+        .screen.active { display: flex; }
+
+        /* Карточки в стиле ТГ с золотым бордером */
+        .tg-card {
+            background: var(--card-bg);
+            border-radius: 16px;
+            padding: 16px;
+            margin-bottom: 12px;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+            position: relative;
+            overflow: hidden;
+        }
+        .tg-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; width: 3px; height: 100%;
+            background: var(--gold-gradient);
+            background-size: 400% 400%;
+            animation: goldShine 6s ease infinite;
+        }
+
+        .tg-title {
+            font-size: 11px;
+            text-transform: uppercase;
+            background: var(--gold-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 10px;
+            font-weight: 800;
+            letter-spacing: 1px;
+        }
+
+        .tg-input {
+            width: 100%;
+            background: #080a0d;
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 12px 14px;
             color: #fff;
-            text-align: center;
+            font-size: 15px;
+            box-sizing: border-box;
+            outline: none;
+            margin-bottom: 10px;
+            transition: border-color 0.3s;
         }
-        button { 
-            width: 90%;
-            padding: 12px; 
-            font-size: 15px; 
-            margin: 6px 0; 
-            border-radius: 6px; 
-            border: none; 
-            cursor: pointer; 
-            font-weight: bold;
-            transition: all 0.2s ease;
+        .tg-input:focus { border-color: #d4af37; box-shadow: var(--gold-glow); }
+
+        /* Переливающаяся золотая кнопка */
+        .tg-btn {
+            width: 100%;
+            background: var(--gold-gradient);
+            background-size: 400% 400%;
+            color: #000;
+            border: none;
+            border-radius: 12px;
+            padding: 14px;
+            font-size: 15px;
+            font-weight: 800;
+            cursor: pointer;
+            box-shadow: var(--gold-glow);
+            text-transform: uppercase;
+            animation: goldShine 6s ease infinite;
+            transition: transform 0.1s;
         }
-        button:hover { opacity: 0.85; transform: translateY(-1px); }
-        .btn-green { background: #238636; color: white; box-shadow: 0 4px 12px rgba(35, 134, 54, 0.3); }
-        .btn-dark { background: #21262d; color: #58a6ff; border: 1px solid #30363d; }
-        .btn-red { background: #da3633; color: white; }
-        
-        #callSection, #codeSection { display: none; }
-        
-        .bonus-card {
-            background: linear-gradient(135deg, #21262d, #1f1a05);
-            border: 1px solid #d29922;
+        .tg-btn:active { transform: scale(0.98); }
+        .tg-btn.secondary {
+            background: var(--card-hover);
+            color: #fcf6ba;
+            border: 1px solid #d4af37;
+            box-shadow: none;
+            animation: none;
+        }
+        .tg-btn.danger {
+            background: linear-gradient(135deg, #e74c3c, #c0392b);
+            color: #fff;
+            animation: none;
+            box-shadow: 0 0 15px rgba(231,76,60,0.4);
+        }
+
+        /* Профиль */
+        .profile-avatar {
+            width: 80px; height: 80px;
+            background: var(--gold-gradient);
+            background-size: 400% 400%;
+            animation: goldShine 6s ease infinite;
+            border-radius: 50%;
+            margin: 0 auto 10px auto;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 32px; font-weight: bold; color: #000;
+            box-shadow: var(--gold-glow);
+        }
+
+        /* Подарки сетка */
+        .gifts-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-top: 8px;
+        }
+        .gift-box {
+            background: #080a0d;
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
             padding: 12px;
-            border-radius: 8px;
-            margin-bottom: 15px;
-            font-size: 13px;
-            color: #f0883e;
+            text-align: center;
+            font-size: 24px;
+            transition: transform 0.2s;
         }
-        
-        #callStatus { 
-            margin-top: 20px; 
-            font-weight: 600; 
-            color: #8b949e; 
-            font-size: 13px; 
+        .gift-box:hover { transform: translateY(-3px); border-color: #d4af37; }
+        .gift-name { font-size: 10px; color: var(--text-secondary); margin-top: 4px; font-weight: bold; }
+
+        /* Чат и стикеры */
+        .chat-messages {
+            flex: 1;
+            background: #080a0d;
+            border-radius: 12px;
             padding: 10px;
-            background: #0d1117;
-            border-radius: 6px;
-            border: 1px solid #21262d;
+            height: 220px;
+            overflow-y: auto;
+            margin-bottom: 10px;
+            border: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .msg {
+            background: var(--card-hover);
+            padding: 8px 12px;
+            border-radius: 10px;
+            max-width: 80%;
+            font-size: 14px;
+            word-break: break-word;
+        }
+        .msg.my {
+            background: linear-gradient(135deg, #d4af37, #aa771c);
+            color: #000;
+            align-self: flex-end;
+            font-weight: 600;
+        }
+
+        .sticker-panel {
+            display: flex;
+            gap: 8px;
+            overflow-x: auto;
+            padding: 5px 0;
+            margin-bottom: 10px;
+        }
+        .sticker-btn {
+            background: var(--card-hover);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 6px 10px;
+            cursor: pointer;
+            font-size: 20px;
+            flex-shrink: 0;
+        }
+        .sticker-btn:hover { border-color: #d4af37; }
+
+        /* Нижнее меню ТГ */
+        .tg-nav {
+            position: fixed;
+            bottom: 0; left: 50%; transform: translateX(-50%);
+            width: 100%; max-width: 420px;
+            background: var(--card-bg);
+            border-top: 1px solid var(--border-color);
+            display: flex; justify-content: space-around;
+            padding: 8px 0;
+            box-sizing: border-box;
+            z-index: 100;
+        }
+        .nav-tab {
+            text-align: center; color: var(--text-secondary);
+            font-size: 11px; cursor: pointer; flex: 1;
+        }
+        .nav-tab.active { color: #fcf6ba; text-shadow: 0 0 10px rgba(212,175,55,0.5); }
+        .nav-tab span { font-size: 20px; display: block; margin-bottom: 2px; }
+
+        #callStatus {
+            text-align: center; font-weight: 700;
+            background: var(--gold-gradient);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            margin-top: 10px; font-size: 13px;
         }
     </style>
 </head>
 <body>
 
-    <div class="container">
-        <h2>MasterVoice</h2>
-        <div class="subtitle">Secure Team & Trading Ecosystem</div>
-
-        <!-- ЭКРАН 1: РЕГИСТРАЦИЯ -->
-        <div id="authSection">
-            <p style="font-size: 13px; color: #8b949e;">Создайте уникальный юзернейм:</p>
-            <input type="text" id="usernameInput" placeholder="@username (уникальный ник)">
-            <input type="text" id="phoneInput" placeholder="Номер телефона (скрыт от всех)">
-            <button class="btn-green" id="getVerificationBtn">Получить код в Telegram-боте</button>
-        </div>
-
-        <!-- ЭКРАН 2: ВВОД КОДА -->
-        <div id="codeSection">
-            <p style="font-size: 13px; color: #3fb950;">Код отправлен в ваш Telegram!</p>
-            <input type="text" id="codeInput" placeholder="Введите 4-значный код">
-            <button class="btn-green" id="verifyBtn">Подтвердить и войти</button>
-        </div>
-
-        <!-- ЭКРАН 3: ЗВОНКИ И БОНУСЫ -->
-        <div id="callSection">
-            <div class="bonus-card">
-                🎁 <b>Бонус:</b> Активирован анимированный золотой Rolls-Royce от <b>MasterVoice</b>! Все стикеры и эмодзи разблокированы.
-            </div>
-
-            <input type="text" id="roomInput" placeholder="ID комнаты связи (например: 777)">
-            <button class="btn-dark" id="randomBtn">🎲 Сгенерировать ID комнаты</button>
-            <br><br>
-            <button class="btn-green" id="joinBtn">Подключиться к связи</button>
-            <button class="btn-dark" id="muteBtn" style="display:none;">🎙 Выключить микрофон</button>
-            <button class="btn-red" id="hangupBtn" style="display:none;">❌ Повесить трубку</button>
-            
-            <div id="callStatus">Статус: Канал готов к работе.</div>
-        </div>
+<div class="app-container">
+    <div class="tg-header">
+        <div class="gold-text">MasterVoice</div>
+        <div style="font-size: 10px; font-weight: 800; padding: 3px 10px; border-radius: 20px; background: var(--gold-gradient); color: #000;">ULTRA GOLD</div>
     </div>
 
-    <audio id="remoteAudio" autoplay></audio>
+    <div class="content-area">
 
-    <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
-    <script>
-        const SERVER_URL = 'https://ТВОЙ-СЕРВЕР.onrender.com'; 
-        let socket;
-        let localStream;
-        let peerConnection;
-        let currentRoom;
-        let isMuted = false;
+        <!-- ЭКРАН 1: АВТОРИЗАЦИЯ -->
+        <div id="screen-auth" class="screen active">
+            <div class="tg-card" style="text-align: center; padding: 25px 16px;">
+                <div class="profile-avatar">👑</div>
+                <h2 class="gold-text" style="margin: 10px 0 5px 0;">Master Trade Auth</h2>
+                <p style="font-size: 13px; color: var(--text-secondary); margin-bottom: 20px;">Введите данные для привязки к боту</p>
+                <input type="text" id="usernameInput" class="tg-input" placeholder="@username">
+                <input type="tel" id="phoneInput" class="tg-input" placeholder="+380 (__) ___ __ __">
+                <button class="tg-btn" id="requestCodeBtn">Получить код в Telegram</button>
+            </div>
+        </div>
 
-        const rtcConfig = {
-            iceServers: [{ urls: 'stun:stun.l.google.com:19302' }]
-        };
+        <!-- ЭКРАН 2: ПРОВЕРКА КОДА -->
+        <div id="screen-code" class="screen">
+            <div class="tg-card" style="text-align: center;">
+                <div class="tg-title">Защитная верификация</div>
+                <p style="font-size: 13px; color: var(--text-secondary);">Код отправлен вашему боту.</p>
+                <input type="text" id="codeInput" class="tg-input" placeholder="••••" style="text-align: center; letter-spacing: 8px; font-size: 22px; font-weight: bold;">
+                <button class="tg-btn" id="verifyCodeBtn">Подтвердить вход</button>
+            </div>
+        </div>
 
-        const authSection = document.getElementById('authSection');
-        const codeSection = document.getElementById('codeSection');
-        const callSection = document.getElementById('callSection');
+        <!-- ЭКРАН 3: ЧАТ И СТИКЕРЫ -->
+        <div id="screen-chats" class="screen">
+            <div class="tg-card" style="flex:1; display:flex; flex-direction:column;">
+                <div class="tg-title">Командный чат Master Trade</div>
+                <div class="chat-messages" id="chatBox">
+                    <div class="msg">Добро пожаловать в защищенный чат MasterVoice! 🚀</div>
+                </div>
+
+                <!-- Панель стикеров и эмодзи -->
+                <div class="sticker-panel">
+                    <button class="sticker-btn" onclick="sendSticker('📈')">📈</button>
+                    <button class="sticker-btn" onclick="sendSticker('🕯')">🕯</button>
+                    <button class="sticker-btn" onclick="sendSticker('💰')">💰</button>
+                    <button class="sticker-btn" onclick="sendSticker('🚗')">🚗</button>
+                    <button class="sticker-btn" onclick="sendSticker('🔥')">🔥</button>
+                    <button class="sticker-btn" onclick="sendSticker('💎')">💎</button>
+                    <button class="sticker-btn" onclick="sendSticker('⭐')">⭐</button>
+                </div>
+
+                <div style="display: flex; gap: 8px;">
+                    <input type="text" id="msgInput" class="tg-input" placeholder="Сообщение..." style="margin-bottom:0;">
+                    <button class="tg-btn" style="width: 70px; padding: 0;" onclick="sendMsg()">➤</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ЭКРАН 4: ЗВОНКИ -->
+        <div id="screen-calls" class="screen">
+            <div class="tg-card">
+                <div class="tg-title">Защищенная аудиосвязь P2P</div>
+                <input type="text" id="roomInput" class="tg-input" placeholder="ID комнаты (например: 777)">
+                <button class="tg-btn secondary" id="randomBtn" style="margin-bottom: 10px;">Случайный ID</button>
+                <button class="tg-btn" id="joinBtn">Подключиться к связи</button>
+                <button class="tg-btn secondary" id="muteBtn" style="display:none; margin-top: 10px;">🎙 Выключить микрофон</button>
+                <button class="tg-btn danger" id="hangupBtn" style="display:none; margin-top: 10px;">❌ Завершить вызов</button>
+                <div id="callStatus">Статус: Готов к звонку</div>
+            </div>
+        </div>
+
+        <!-- ЭКРАН 5: ПРОФИЛЬ И ПОДАРКИ -->
+        <div id="screen-profile" class="screen">
+            <div class="tg-card" style="text-align: center;">
+                <div class="profile-avatar">👑</div>
+                <div style="font-size: 20px; font-weight: 800;" id="profileNameDisplay">@user</div>
+                <div style="font-size: 13px; color: #d4af37; margin-bottom: 15px;">В сети (Премиум)</div>
+                
+                <div style="background: #080a0d; border-radius: 12px; padding: 12px; border: 1px solid var(--border-color); text-align: left;">
+                    <div style="font-size: 10px; color: var(--text-secondary);">СКРЫТЫЙ НОМЕР</div>
+                    <div style="font-size: 14px; font-weight: 600;" id="profilePhoneDisplay">+380 (__) ___ __ __</div>
+                </div>
+            </div>
+
+            <div class="tg-card">
+                <div class="tg-title">Подарки коллекции (Gold)</div>
+                <div class="gifts-grid">
+                    <div class="gift-box">🚗<div class="gift-name">Rolls-Royce</div></div>
+                    <div class="gift-box">🧸<div class="gift-name">Gold Bear</div></div>
+                    <div class="gift-box">💎<div class="gift-name">Diamond</div></div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Нижняя панель навигации ТГ -->
+    <div class="tg-nav">
+        <div class="nav-tab active" onclick="switchTab('chats', this)"><span>💬</span>Чаты</div>
+        <div class="nav-tab" onclick="switchTab('calls', this)"><span>📞</span>Звонки</div>
+        <div class="nav-tab" onclick="switchTab('profile', this)"><span>👤</span>Профиль</div>
+    </div>
+</div>
+
+<audio id="remoteAudio" autoplay></audio>
+<script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+<script>
+    const SERVER_URL = 'https://ТВОЙ-СЕРВЕР.onrender.com'; 
+    let socket, localStream, peerConnection, currentRoom;
+    let isMuted = false;
+    let generatedRealCode = "";
+
+    const rtcConfig = { iceServers: [{ urls: 'stun:stun.l.google.com:19302' }] };
+
+    function showScreen(id) {
+        document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+        document.getElementById(id).classList.add('active');
+    }
+
+    function switchTab(tabName, el) {
+        document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+        el.classList.add('active');
+        if(tabName === 'chats') showScreen('screen-chats');
+        if(tabName === 'calls') showScreen('screen-calls');
+        if(tabName === 'profile') showScreen('screen-profile');
+    }
+
+    document.getElementById('requestCodeBtn').onclick = () => {
+        const username = document.getElementById('usernameInput').value.trim();
+        const phone = document.getElementById('phoneInput').value.trim();
+
+        if (!username.startsWith('@')) { alert('Введите корректный юзернейм с @'); return; }
+        if (phone.length < 5) { alert('Введите номер телефона'); return; }
+
+        generatedRealCode = Math.floor(1000 + Math.random() * 9000).toString();
+        console.log("Ваш защитный код подтверждения:", generatedRealCode);
+
+        document.getElementById('profileNameDisplay').innerText = username;
+        document.getElementById('profilePhoneDisplay').innerText = phone;
+
+        showScreen('screen-code');
+        alert('Код подтверждения сгенерирован и отправлен в бота!');
+    };
+
+    document.getElementById('verifyCodeBtn').onclick = () => {
+        const userCode = document.getElementById('codeInput').value.trim();
+        if (userCode !== generatedRealCode) {
+            alert('❌ Ошибка: неверный код верификации!');
+            return;
+        }
+        showScreen('screen-chats');
+        initSocketConnection();
+    };
+
+    function sendMsg() {
+        const input = document.getElementById('msgInput');
+        const text = input.value.trim();
+        if(!text) return;
+        appendMsg(text, true);
+        input.value = '';
+    }
+
+    function sendSticker(emoji) {
+        appendMsg(emoji + " (Стикер/Эмодзи)", true);
+    }
+
+    function appendMsg(text, isMy) {
+        const box = document.getElementById('chatBox');
+        const div = document.createElement('div');
+        div.className = isMy ? 'msg my' : 'msg';
+        div.innerText = text;
+        box.appendChild(div);
+        box.scrollTop = box.scrollHeight;
+    }
+
+    function initSocketConnection() {
+        try {
+            socket = io(SERVER_URL);
+            setupSocketListeners();
+        } catch(e) {}
+    }
+
+    document.getElementById('randomBtn').onclick = () => {
+        document.getElementById('roomInput').value = Math.floor(100000 + Math.random() * 900000);
+    };
+
+    const joinBtn = document.getElementById('joinBtn');
+    const muteBtn = document.getElementById('muteBtn');
+    const hangupBtn = document.getElementById('hangupBtn');
+    const callStatus = document.getElementById('callStatus');
+    const remoteAudio = document.getElementById('remoteAudio');
+    const roomInput = document.getElementById('roomInput');
+
+    joinBtn.onclick = async () => {
+        currentRoom = roomInput.value.trim();
+        if (!currentRoom) { alert('Введите ID комнаты'); return; }
+
+        try {
+            localStream = await navigator.mediaDevices.getUserMedia({ audio: true, video: false });
+            callStatus.innerText = 'Микрофон активен. Установка связи...';
+        } catch (err) { alert('Ошибка микрофона: ' + err.message); return; }
+
+        if (socket) socket.emit('join-room', currentRoom);
         
-        document.getElementById('getVerificationBtn').onclick = () => {
-            const username = document.getElementById('usernameInput').value.trim();
-            if (!username.startsWith('@') || username.length < 3) {
-                alert('Введите юзернейм, начиная с @ (например, @master)');
-                return;
-            }
-            authSection.style.display = 'none';
-            codeSection.style.display = 'block';
-        };
+        joinBtn.style.display = 'none';
+        document.getElementById('randomBtn').style.display = 'none';
+        roomInput.disabled = true;
+        muteBtn.style.display = 'block';
+        hangupBtn.style.display = 'block';
+    };
 
-        document.getElementById('verifyBtn').onclick = () => {
-            const code = document.getElementById('codeInput').value.trim();
-            if (code.length < 4) {
-                alert('Введите правильный код!');
-                return;
-            }
-            codeSection.style.display = 'none';
-            callSection.style.display = 'block';
-            initSocketConnection();
-        };
-
-        function initSocketConnection() {
-            try {
-                socket = io(SERVER_URL);
-                setupSocketListeners();
-            } catch (e) {
-                console.log('Ожидание сервера');
-            }
+    muteBtn.onclick = () => {
+        if (localStream) {
+            const audioTrack = localStream.getAudioTracks()[0];
+            isMuted = !isMuted;
+            audioTrack.enabled = !isMuted;
+            muteBtn.innerText = isMuted ? '🔇 Включить микрофон' : '🎙 Выключить микрофон';
+            callStatus.innerText = isMuted ? 'Микрофон отключен (Mute)' : 'Связь активна!';
         }
+    };
 
-        document.getElementById('randomBtn').onclick = () => {
-            document.getElementById('roomInput').value = Math.floor(100000 + Math.random() * 900000);
-        };
+    hangupBtn.onclick = () => location.reload();
 
-        const joinBtn = document.getElementById('joinBtn');
-        const muteBtn = document.getElementById('muteBtn');
-        const hangupBtn = document.getElementById('hangupBtn');
-        const callStatus = document.getElementById('callStatus');
-        const remoteAudio = document.getElementById('remoteAudio');
-        const roomInput = document.getElementById('roomInput');
+    function setupSocketListeners() {
+        socket.on('user-joined', async (userId) => {
+            callStatus.innerText = 'Собеседник на связи...';
+            peerConnection = createPeerConnection(userId);
+            const offer = await peerConnection.createOffer();
+            await peerConnection.setLocalDescription(offer);
+            socket.emit('offer', { room: currentRoom, offer: offer });
+        });
 
-        joinBtn.onclick = async () => {
-            currentRoom = roomInput.value.trim();
-            if (!currentRoom) {
-                alert('Введите ID комнаты!');
-                return;
+        socket.on('offer', async (offer) => {
+            callStatus.innerText = 'Входящий вызов...';
+            peerConnection = createPeerConnection();
+            await peerConnection.setRemoteDescription(new RTCSessionDescription(offer));
+            const answer = await peerConnection.createAnswer();
+            await peerConnection.setLocalDescription(answer);
+            socket.emit('answer', { room: currentRoom, answer: answer });
+        });
+
+        socket.on('answer', async (answer) => {
+            await peerConnection.setRemoteDescription(new RTCSessionDescription(answer));
+            callStatus.innerText = '🟢 Связь установлена!';
+        });
+
+        socket.on('ice-candidate', async (candidate) => {
+            if (peerConnection) {
+                await peerConnection.addIceCandidate(new RTCIceCandidate(candidate));
             }
+        });
+    }
 
-            try {
-                localStream = await navigator.mediaDevices.getUserMedia({ audio: true, video: false });
-                callStatus.innerText = 'Микрофон активен. Подключение...';
-            } catch (err) {
-                alert('Ошибка микрофона: ' + err.message);
-                return;
-            }
-
-            if (socket) socket.emit('join-room', currentRoom);
-            
-            joinBtn.style.display = 'none';
-            document.getElementById('randomBtn').style.display = 'none';
-            roomInput.disabled = true;
-            muteBtn.style.display = 'block';
-            hangupBtn.style.display = 'block';
-        };
-
-        muteBtn.onclick = () => {
-            if (localStream) {
-                const audioTrack = localStream.getAudioTracks()[0];
-                isMuted = !isMuted;
-                audioTrack.enabled = !isMuted;
-                muteBtn.innerText = isMuted ? '🔇 Включить микрофон' : '🎙 Выключить микрофон';
-                callStatus.innerText = isMuted ? 'Микрофон отключен (Mute)' : 'Канал активен!';
+    function createPeerConnection() {
+        const pc = new RTCPeerConnection(rtcConfig);
+        pc.onicecandidate = (event) => {
+            if (event.candidate) {
+                socket.emit('ice-candidate', { room: currentRoom, candidate: event.candidate });
             }
         };
-
-        hangupBtn.onclick = () => location.reload();
-
-        function setupSocketListeners() {
-            socket.on('user-joined', async (userId) => {
-                callStatus.innerText = 'Собеседник на связи...';
-                peerConnection = createPeerConnection(userId);
-                const offer = await peerConnection.createOffer();
-                await peerConnection.setLocalDescription(offer);
-                socket.emit('offer', { room: currentRoom, offer: offer });
-            });
-
-            socket.on('offer', async (offer) => {
-                callStatus.innerText = 'Входящий вызов...';
-                peerConnection = createPeerConnection();
-                await peerConnection.setRemoteDescription(new RTCSessionDescription(offer));
-                const answer = await peerConnection.createAnswer();
-                await peerConnection.setLocalDescription(answer);
-                socket.emit('answer', { room: currentRoom, answer: answer });
-            });
-
-            socket.on('answer', async (answer) => {
-                await peerConnection.setRemoteDescription(new RTCSessionDescription(answer));
-                callStatus.innerText = '🟢 Связь установлена!';
-            });
-
-            socket.on('ice-candidate', async (candidate) => {
-                if (peerConnection) {
-                    await peerConnection.addIceCandidate(new RTCIceCandidate(candidate));
-                }
-            });
-        }
-
-        function createPeerConnection() {
-            const pc = new RTCPeerConnection(rtcConfig);
-            pc.onicecandidate = (event) => {
-                if (event.candidate) {
-                    socket.emit('ice-candidate', { room: currentRoom, candidate: event.candidate });
-                }
-            };
-            pc.ontrack = (event) => {
-                remoteAudio.srcObject = event.streams[0];
-                callStatus.innerText = '🟢 Связь установлена!';
-            };
-            localStream.getTracks().forEach((track) => {
-                pc.addTrack(track, localStream);
-            });
-            return pc;
-        }
-    </script>
+        pc.ontrack = (event) => {
+            remoteAudio.srcObject = event.streams[0];
+            callStatus.innerText = '🟢 Связь установлена!';
+        };
+        localStream.getTracks().forEach((track) => {
+            pc.addTrack(track, localStream);
+        });
+        return pc;
+    }
+</script>
 </body>
 </html>
