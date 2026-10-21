@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>MasterVoice — Ultimate Team Messenger</title>
+    <style>
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            text-align: center; 
+            margin: 0; 
+            padding-top: 30px; 
+            background: #0d1117; 
+            color: #c9d1d9; 
+        }
+        .container {
+            max-width: 440px;
+            margin: 0 auto;
+            background: #161b22;
+            padding: 25px;
+            border-radius: 14px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.6);
+            border: 1px solid #30363d;
+        }
+        h2 { color: #58a6ff; margin-bottom: 5px; font-size: 24px; }
+        .subtitle { font-size: 11px; color: #8b949e; margin-bottom: 20px; text-transform: uppercase; letter-spacing: 2px; font-weight: bold; }
+        
+        input { 
+            width: 85%; 
+            padding: 12px; 
+            font-size: 15px; 
+            margin-bottom: 12px; 
+            border-radius: 6px; 
+            border: 1px solid #30363d; 
+            background: #0d1117; 
+            color: #fff;
+            text-align: center;
+        }
+        button { 
+            width: 90%;
+            padding: 12px; 
+            font-size: 15px; 
+            margin: 6px 0; 
+            border-radius: 6px; 
+            border: none; 
+            cursor: pointer; 
+            font-weight: bold;
+            transition: all 0.2s ease;
+        }
+        button:hover { opacity: 0.85; transform: translateY(-1px); }
+        .btn-green { background: #238636; color: white; box-shadow: 0 4px 12px rgba(35, 134, 54, 0.3); }
+        .btn-dark { background: #21262d; color: #58a6ff; border: 1px solid #30363d; }
+        .btn-red { background: #da3633; color: white; }
+        
+        #callSection, #codeSection { display: none; }
+        
+        .bonus-card {
+            background: linear-gradient(135deg, #21262d, #1f1a05);
+            border: 1px solid #d29922;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            font-size: 13px;
+            color: #f0883e;
+        }
+        
+        #callStatus { 
+            margin-top: 20px; 
+            font-weight: 600; 
+            color: #8b949e; 
+            font-size: 13px; 
+            padding: 10px;
+            background: #0d1117;
+            border-radius: 6px;
+            border: 1px solid #21262d;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h2>MasterVoice</h2>
+        <div class="subtitle">Secure Team & Trading Ecosystem</div>
+
+        <!-- ЭКРАН 1: РЕГИСТРАЦИЯ -->
+        <div id="authSection">
+            <p style="font-size: 13px; color: #8b949e;">Создайте уникальный юзернейм:</p>
+            <input type="text" id="usernameInput" placeholder="@username (уникальный ник)">
+            <input type="text" id="phoneInput" placeholder="Номер телефона (скрыт от всех)">
+            <button class="btn-green" id="getVerificationBtn">Получить код в Telegram-боте</button>
+        </div>
+
+        <!-- ЭКРАН 2: ВВОД КОДА -->
+        <div id="codeSection">
+            <p style="font-size: 13px; color: #3fb950;">Код отправлен в ваш Telegram!</p>
+            <input type="text" id="codeInput" placeholder="Введите 4-значный код">
+            <button class="btn-green" id="verifyBtn">Подтвердить и войти</button>
+        </div>
+
+        <!-- ЭКРАН 3: ЗВОНКИ И БОНУСЫ -->
+        <div id="callSection">
+            <div class="bonus-card">
+                🎁 <b>Бонус:</b> Активирован анимированный золотой Rolls-Royce от <b>MasterVoice</b>! Все стикеры и эмодзи разблокированы.
+            </div>
+
+            <input type="text" id="roomInput" placeholder="ID комнаты связи (например: 777)">
+            <button class="btn-dark" id="randomBtn">🎲 Сгенерировать ID комнаты</button>
+            <br><br>
+            <button class="btn-green" id="joinBtn">Подключиться к связи</button>
+            <button class="btn-dark" id="muteBtn" style="display:none;">🎙 Выключить микрофон</button>
+            <button class="btn-red" id="hangupBtn" style="display:none;">❌ Повесить трубку</button>
+            
+            <div id="callStatus">Статус: Канал готов к работе.</div>
+        </div>
+    </div>
+
+    <audio id="remoteAudio" autoplay></audio>
+
+    <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+    <script>
+        const SERVER_URL = 'https://ТВОЙ-СЕРВЕР.onrender.com'; 
+        let socket;
+        let localStream;
+        let peerConnection;
+        let currentRoom;
+        let isMuted = false;
+
+        const rtcConfig = {
+            iceServers: [{ urls: 'stun:stun.l.google.com:19302' }]
+        };
+
+        const authSection = document.getElementById('authSection');
+        const codeSection = document.getElementById('codeSection');
+        const callSection = document.getElementById('callSection');
+        
+        document.getElementById('getVerificationBtn').onclick = () => {
+            const username = document.getElementById('usernameInput').value.trim();
+            if (!username.startsWith('@') || username.length < 3) {
+                alert('Введите юзернейм, начиная с @ (например, @master)');
+                return;
+            }
+            authSection.style.display = 'none';
+            codeSection.style.display = 'block';
+        };
+
+        document.getElementById('verifyBtn').onclick = () => {
+            const code = document.getElementById('codeInput').value.trim();
+            if (code.length < 4) {
+                alert('Введите правильный код!');
+                return;
+            }
+            codeSection.style.display = 'none';
+            callSection.style.display = 'block';
+            initSocketConnection();
+        };
+
+        function initSocketConnection() {
+            try {
+                socket = io(SERVER_URL);
+                setupSocketListeners();
+            } catch (e) {
+                console.log('Ожидание сервера');
+            }
+        }
+
+        document.getElementById('randomBtn').onclick = () => {
+            document.getElementById('roomInput').value = Math.floor(100000 + Math.random() * 900000);
+        };
+
+        const joinBtn = document.getElementById('joinBtn');
+        const muteBtn = document.getElementById('muteBtn');
+        const hangupBtn = document.getElementById('hangupBtn');
+        const callStatus = document.getElementById('callStatus');
+        const remoteAudio = document.getElementById('remoteAudio');
+        const roomInput = document.getElementById('roomInput');
+
+        joinBtn.onclick = async () => {
+            currentRoom = roomInput.value.trim();
+            if (!currentRoom) {
+                alert('Введите ID комнаты!');
+                return;
+            }
+
+            try {
+                localStream = await navigator.mediaDevices.getUserMedia({ audio: true, video: false });
+                callStatus.innerText = 'Микрофон активен. Подключение...';
+            } catch (err) {
+                alert('Ошибка микрофона: ' + err.message);
+                return;
+            }
+
+            if (socket) socket.emit('join-room', currentRoom);
+            
+            joinBtn.style.display = 'none';
+            document.getElementById('randomBtn').style.display = 'none';
+            roomInput.disabled = true;
+            muteBtn.style.display = 'block';
+            hangupBtn.style.display = 'block';
+        };
+
+        muteBtn.onclick = () => {
+            if (localStream) {
+                const audioTrack = localStream.getAudioTracks()[0];
+                isMuted = !isMuted;
+                audioTrack.enabled = !isMuted;
+                muteBtn.innerText = isMuted ? '🔇 Включить микрофон' : '🎙 Выключить микрофон';
+                callStatus.innerText = isMuted ? 'Микрофон отключен (Mute)' : 'Канал активен!';
+            }
+        };
+
+        hangupBtn.onclick = () => location.reload();
+
+        function setupSocketListeners() {
+            socket.on('user-joined', async (userId) => {
+                callStatus.innerText = 'Собеседник на связи...';
+                peerConnection = createPeerConnection(userId);
+                const offer = await peerConnection.createOffer();
+                await peerConnection.setLocalDescription(offer);
+                socket.emit('offer', { room: currentRoom, offer: offer });
+            });
+
+            socket.on('offer', async (offer) => {
+                callStatus.innerText = 'Входящий вызов...';
+                peerConnection = createPeerConnection();
+                await peerConnection.setRemoteDescription(new RTCSessionDescription(offer));
+                const answer = await peerConnection.createAnswer();
+                await peerConnection.setLocalDescription(answer);
+                socket.emit('answer', { room: currentRoom, answer: answer });
+            });
+
+            socket.on('answer', async (answer) => {
+                await peerConnection.setRemoteDescription(new RTCSessionDescription(answer));
+                callStatus.innerText = '🟢 Связь установлена!';
+            });
+
+            socket.on('ice-candidate', async (candidate) => {
+                if (peerConnection) {
+                    await peerConnection.addIceCandidate(new RTCIceCandidate(candidate));
+                }
+            });
+        }
+
+        function createPeerConnection() {
+            const pc = new RTCPeerConnection(rtcConfig);
+            pc.onicecandidate = (event) => {
+                if (event.candidate) {
+                    socket.emit('ice-candidate', { room: currentRoom, candidate: event.candidate });
+                }
+            };
+            pc.ontrack = (event) => {
+                remoteAudio.srcObject = event.streams[0];
+                callStatus.innerText = '🟢 Связь установлена!';
+            };
+            localStream.getTracks().forEach((track) => {
+                pc.addTrack(track, localStream);
+            });
+            return pc;
+        }
+    </script>
+</body>
+</html>
